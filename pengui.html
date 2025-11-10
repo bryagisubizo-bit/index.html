@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penguin Rescue Math Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .game-container {
+            width: 90%;
+            max-width: 800px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .game-area {
+            height: calc(100% - 120px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .question {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a2a6c;
+            animation: drop 6s linear forwards;
+            text-align: center;
+            width: 250px;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        @keyframes drop {
+            to {
+                top: 70%;
+            }
+        }
+        
+        .input-area {
+            position: absolute;
+            top: 70%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            align-items: bottom;
+        }
+        
+        .input-area input {
+            padding: 15px 20px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 15px;
+            width: 150px;
+            text-align: bottom;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            outline: none;
+        }
+        
+        .input-area button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .input-area button:hover {
+            background: #ff5252;
+            transform: translateY(-3px);
+        }
+        
+        .penguin-container {
+            position: absolute;
+            bottom: 0;
+            right: 50px;
+            transition: all 0.5s ease;
+        }
+        
+        .penguin {
+            width: 100px;
+            height: 100px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .penguin-body {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            top: 10px;
+            left: 10px;
+        }
+        
+        .penguin-head {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            top: 0;
+            left: 25px;
+        }
+        
+        .penguin-eye {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: black;
+            border-radius: 50%;
+            top: 15px;
+            left: 35px;
+        }
+        
+        .penguin-beak {
+            position: absolute;
+            width: 15px;
+            height: 10px;
+            background: #ffd166;
+            border-radius: 50%;
+            top: 25px;
+            left: 42px;
+        }
+        
+        .penguin-wing {
+            position: absolute;
+            width: 40px;
+            height: 20px;
+            background: #ff9e7d;
+            border-radius: 50%;
+            top: 30px;
+            left: 5px;
+            transform: rotate(-20deg);
+        }
+        
+        .penguin-leg {
+            position: absolute;
+            width: 8px;
+            height: 20px;
+            background: #ffd166;
+            top: 70px;
+            left: 40px;
+        }
+        
+        .penguin-leg:nth-child(2) {
+            left: 52px;
+        }
+        
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 50px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .message.show {
+            opacity: 1;
+        }
+        
+        .message h2 {
+            color: #1a2a6c;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .message p {
+            color: #333;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .message button {
+            padding: 12px 30px;
+            background: #4ecdc4;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .message button:hover {
+            background: #2a9d8f;
+            transform: translateY(-3px);
+        }
+        
+        .snowflake {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .correct {
+            animation: correctAnimation 0.5s ease;
+        }
+        
+        @keyframes correctAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .incorrect {
+            animation: incorrectAnimation 0.5s ease;
+        }
+        
+        @keyframes incorrectAnimation {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+        
+        .success-animation {
+            animation: successAnimation 1s ease;
+        }
+        
+        @keyframes successAnimation {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .bottom-section {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .vase {
+            width: 100px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 10px;
+        }
+        
+        .vase::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .penguin-in-vase {
+            width: 30px;
+            height: 30px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .penguin-in-vase::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            top: 5px;
+            left: 5px;
+        }
+        
+        .penguin-in-vase::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: black;
+            border-radius: 50%;
+            top: 7px;
+            left: 10px;
+        }
+        
+        .submit-button {
+            padding: 12px 25px;
+            background: #4ecdc4;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .submit-button:hover {
+            background: #2a9d8f;
+            transform: translateY(-3px);
+        }
+        
+        .penguin-display {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .penguin-display span {
+            color: white;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .penguin-image {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 120px;
+            height: 120px;
+            z-index: 5;
+        }
+        
+        .penguin-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+  /* ===== Background iframe styles ===== */
+  #bgVideoWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: -1;           /* keeps it behind everything */
+    pointer-events: none;  /* prevents clicks on it */
+  }
+
+  #bgVideo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120%;
+    height: 120%;
+    transform: translate(-50%, -50%);
+    border: none;
+    object-fit: cover;
+  }
+  .scene {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+/* Vase (normal) */
+.vase {
+  width: 90px;
+  height: 60px;
+  background: linear-gradient(to top, #3c3c3c, #6d6d6d);
+  border-top-left-radius: 50%;
+  border-top-right-radius: 50%;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  position: relative;
+  box-shadow: inset 0 5px 10px rgba(255,255,255,0.2), 0 5px 10px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+/* Penguin (normal) */
+.penguin {
+  position: absolute;
+  bottom: 60px;
+  width: 100px;
+  height: 100px;
+  background: black;
+  border-radius: 50% 50% 40% 40%;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+  transition: transform 0.3s ease;
+}
+
+.penguin::before {
+  content: "";
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 50%;
+  top: 20px;
+  left: 20px;
+}
+
+.penguin::after {
+  content: "";
+  position: absolute;
+  width: 25px;
+  height: 15px;
+  background: orange;
+  border-radius: 50%;
+  top: 70px;
+  left: 37px;
+}
+
+/* Normal bounce animation */
+.penguin {
+  animation: bounce 1s infinite ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* 🔴 Broken vase animation */
+.vase.break {
+  background: linear-gradient(to top, #5a5a5a, #999);
+  transform: rotate(15deg) scale(0.9);
+  box-shadow: 0 0 20px red;
+}
+
+/* 🐧 Falling penguin animation */
+.penguin.fall {
+  animation: fallDown 1.5s ease forwards;
+}
+
+@keyframes fallDown {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(150px) rotate(90deg); opacity: 0; }
+}
+/* 🏠 Home Button Styling */
+.home-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  font-size: 1.8rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 9999;
+}
+.home-button:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+}
+    </style>
+</head>
+<body>
+    <!-- 🏠 Home Button -->
+<button id="home-btn" class="home-button" title="Go Home">🏠</button>
+    <div class="game-container">
+        <div class="header">
+            <h1>🐧 Penguin Rescue 🐧</h1>
+            <div class="stats">
+                <div>Questions: <span id="question-count">0</span>/10</div>
+                <div>Correct: <span id="correct-count">0</span></div>
+                <div>Penguins Free: <span id="penguin-count">0</span></div>
+            </div>
+        </div>
+        
+        <div class="game-area" id="game-area">
+            <!-- Questions will appear here -->
+            <!-- Penguins will appear here -->
+            <div class="penguin-image">
+                <img src="https://pfst.cf2.poecdn.net/base/image/74f24b026c77420015a92aa45e28629d5c10d0d5657043469463be18d231f0f0?w=1024&h=800" alt="Cute Penguin">
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <input type="number" id="answer-input" placeholder="?" autocomplete="off">
+            <button onclick="checkAnswer()">Submit</button>
+        </div>
+        
+        <div class="bottom-section">
+            <div class="vase">
+                <div class="penguin-in-vase"></div>
+            </div>
+            <div class="penguin-display">
+                <span>Penguins in Vase:</span>
+                <span id="vase-penguin-count">0</span>
+            </div>
+            <div class="penguin-display">
+                <span>Penguins in Vase:</span>
+                <span id="vase-penguin-count2">0</span>
+            </div>
+            <div class="vase">
+                <div class="penguin-in-vase"></div>
+            </div>
+        </div>
+        <div class="scene">
+  <div class="vase"></div>
+  <div class="penguin"></div>
+</div>
+        <div class="message" id="message">
+            <h2 id="message-title">Game Over!</h2>
+            <p id="message-text">You freed <span id="freed-penguins">0</span> penguins!</p>
+            <button onclick="restartGame()">Play Again</button>
+        </div>
+    <script>
+        // Game variables
+        let currentQuestion = null;
+        let correctAnswers = 0;
+        let totalQuestions = 0;
+        let penguinsFreed = 0;
+        let questions = [];
+        let activeQuestions = [];
+        let gameActive = true;
+        let questionInterval = null;
+        let vasePenguins = 0;
+        
+        // Generate math problems - only basic multiplication and division
+        function generateQuestions() {
+            const operations = ['*', '/']; // Only multiplication and division
+            const nums = [];
+            
+            for (let i = 0; i < 20; i++) {
+                let num1, num2, operation, answer, question;
+                
+                // Determine operation
+                operation = operations[Math.floor(Math.random() * operations.length)];
+                
+                // For multiplication: both numbers from 1-9
+                if (operation === '*') {
+                    num1 = Math.floor(Math.random() * 9) + 1;
+                    num2 = Math.floor(Math.random() * 9) + 1;
+                    answer = num1 * num2;
+                    question = `${num1} × ${num2} = ?`;
+                }
+                // For division: divisor from 1-9, dividend is product of num1 and num2
+                else {
+                    num1 = Math.floor(Math.random() * 9) + 1;
+                    num2 = Math.floor(Math.random() * 9) + 1;
+                    const product = num1 * num2;
+                    answer = num2; // We're asking for the divisor
+                    question = `${product} ÷ ${num1} = ?`;
+                }
+                
+                nums.push({
+                    question: question,
+                    answer: answer
+                });
+            }
+            
+            return nums;
+        }
+        
+        // Create question element
+        function createQuestion() {
+            if (!gameActive || totalQuestions >= 10) return;
+            
+            const questionObj = questions[totalQuestions];
+            if (!questionObj) return;
+            
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question';
+            questionElement.textContent = questionObj.question;
+            questionElement.dataset.answer = questionObj.answer;
+            questionElement.dataset.index = totalQuestions;
+            
+            const gameArea = document.getElementById('game-area');
+            gameArea.appendChild(questionElement);
+            
+            // Start animation
+            setTimeout(() => {
+                questionElement.style.animation = `drop 6s linear forwards`;
+            }, 10);
+            
+            // Remove question if time runs out
+            setTimeout(() => {
+                if (questionElement.parentNode && !questionElement.classList.contains('answered')) {
+                    gameOver();
+                }
+            }, 6000);
+            
+            activeQuestions.push(questionElement);
+            totalQuestions++;
+            updateStats();
+            
+            // Schedule next question with 6 second interval
+            questionInterval = setTimeout(createQuestion, 6000);
+        }
+        
+        // Check answer
+        function checkAnswer() {
+            if (!gameActive) return;
+            
+            const input = document.getElementById('answer-input');
+            const answer = parseInt(input.value);
+            
+            if (isNaN(answer)) {
+                alert('Please enter a valid number!');
+                return;
+                window.freePenguin(); // ibura rimwe iyo user asubije neza
+
+            }
+            
+            // Find the first unanswered question
+            const unansweredQuestion = activeQuestions.find(q => !q.classList.contains('answered'));
+            
+            if (unansweredQuestion) {
+                const correctAnswer = parseInt(unansweredQuestion.dataset.answer);
+                
+                if (answer === correctAnswer) {
+                    // Correct answer
+                    unansweredQuestion.classList.add('correct');
+                    unansweredQuestion.classList.add('answered');
+                    correctAnswers++;
+                    
+                    // Remove from active questions
+                    const index = activeQuestions.indexOf(unansweredQuestion);
+                    if (index > -1) {
+                        activeQuestions.splice(index, 1);
+                    }
+                    
+                    // Show success animation
+                    createPenguin();
+                    
+                    // Reset input
+                    input.value = '';
+                    
+                    // Update stats
+                    updateStats();
+                    
+                    // Check win condition
+                    if (correctAnswers >= 3) {
+                        resetCorrectCounter();
+                    }
+                } else {
+                    // Incorrect answer
+                    unansweredQuestion.classList.add('incorrect');
+                    unansweredQuestion.classList.add('answered');
+                    
+                    // Remove from active questions
+                    const index = activeQuestions.indexOf(unansweredQuestion);
+                    if (index > -1) {
+                        activeQuestions.splice(index, 1);
+                    }
+                    
+                    // Reset input
+                    input.value = '';
+                    
+                    // Show error message
+                    showErrorMessage();
+                }
+            }
+        }
+        
+        // Create penguin animation
+        function createPenguin() {
+            const container = document.querySelector('.penguin-container');
+            if (!container) {
+                const penguinContainer = document.createElement('div');
+                penguinContainer.className = 'penguin-container';
+                document.getElementById('game-area').appendChild(penguinContainer);
+            }
+            
+            const penguin = document.createElement('div');
+            penguin.className = 'penguin';
+            
+            penguin.innerHTML = `
+                <div class="penguin-body"></div>
+                <div class="penguin-head"></div>
+                <div class="penguin-eye"></div>
+                <div class="penguin-beak"></div>
+                <div class="penguin-wing"></div>
+                <div class="penguin-leg"></div>
+                <div class="penguin-leg"></div>
+            `;
+            
+            document.querySelector('.penguin-container').appendChild(penguin);
+            penguin.classList.add('success-animation');
+            
+            penguinsFreed++;
+            updateStats();
+            
+            // Add floating effect
+            setInterval(() => {
+                penguin.style.animation = 'none';
+                setTimeout(() => {
+                    penguin.style.animation = 'float 3s ease-in-out infinite';
+                }, 10);
+            }, 1000);
+            
+            // Add penguin to vase
+            vasePenguins++;
+            document.getElementById('vase-penguin-count').textContent = vasePenguins;
+            document.getElementById('vase-penguin-count2').textContent = vasePenguins;
+        }
+        
+        // Reset correct counter after 3
+        function resetCorrectCounter() {
+            correctAnswers = 0;
+            createPenguin();
+        }
+        
+        // Update stats display
+        function updateStats() {
+            document.getElementById('question-count').textContent = totalQuestions;
+            document.getElementById('correct-count').textContent = correctAnswers;
+            document.getElementById('penguin-count').textContent = penguinsFreed;
+        }
+        
+        // Show error message
+        function showErrorMessage() {
+            const message = document.getElementById('message');
+            document.getElementById('message-title').textContent = 'Try Again!';
+            document.getElementById('message-text').innerHTML = `That's not correct! Try again.`;
+            message.classList.add('show');
+            
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 2000);
+        }
+        
+        // Game over
+        function gameOver() {
+            gameActive = false;
+            clearTimeout(questionInterval);
+            document.getElementById('message-title').textContent = 'Game Over!';
+            document.getElementById('message-text').innerHTML = `You freed <span id="freed-penguins">${penguinsFreed}</span> penguins!`;
+            document.getElementById('freed-penguins').textContent = penguinsFreed;
+            document.getElementById('message').classList.add('show');
+        }
+        
+        // Restart game
+        function restartGame() {
+            // Reset game state
+            gameActive = true;
+            correctAnswers = 0;
+            totalQuestions = 0;
+            penguinsFreed = 0;
+            vasePenguins = 0;
+            activeQuestions = [];
+            questions = generateQuestions();
+            
+            // Clear DOM
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            document.querySelector('.penguin-container')?.remove();
+            
+            // Add back the penguin image
+            const penguinImage = document.createElement('div');
+            penguinImage.className = 'penguin-image';
+            penguinImage.innerHTML = '<img src="https://pfst.cf2.poecdn.net/base/image/74f24b026c77420015a92aa45e28629d5c10d0d5657043469463be18d231f0f0?w=1024&h=768" alt="Cute Penguin">';
+            gameArea.appendChild(penguinImage);
+            
+            // Clear message
+            document.getElementById('message').classList.remove('show');
+            
+            // Clear input
+            document.getElementById('answer-input').value = '';
+            
+            // Update stats
+            updateStats();
+            
+            // Update vase count
+            document.getElementById('vase-penguin-count').textContent = vasePenguins;
+            document.getElementById('vase-penguin-count2').textContent = vasePenguins;
+            
+            // Start new game
+            setTimeout(createQuestion, 6000);
+        }
+        
+        // Initialize game
+        function initGame() {
+            questions = generateQuestions();
+            updateStats();
+            
+            // Create initial snowflakes
+            createSnowflakes();
+            
+            // Start first question with 6 second delay
+            setTimeout(createQuestion, 6000);
+        }
+        
+        // Create snowflakes
+        function createSnowflakes() {
+            const gameArea = document.getElementById('game-area');
+            for (let i = 0; i < 30; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.style.width = `${Math.random() * 10 + 5}px`;
+                snowflake.style.height = snowflake.style.width;
+                snowflake.style.left = `${Math.random() * 100}%`;
+                snowflake.style.top = `${Math.random() * 100}%`;
+                snowflake.style.opacity = Math.random();
+                gameArea.appendChild(snowflake);
+                
+                // Animate snowflake
+                animateSnowflake(snowflake);
+            }
+            // At the beginning of your game script in penguin_game.html
+const urlParams = new URLSearchParams(window.location.search);
+const difficulty = urlParams.get('difficulty');
+
+// Adjust game settings based on difficulty
+if (difficulty === 'easy') {
+    // Set parameters for easy mode
+} else if (difficulty === 'medium') {
+    // Set parameters for medium mode
+} else if (difficulty === 'hard') {
+    // Set parameters for hard mode
+}
+        }
+        
+        // Animate snowflake
+        function animateSnowflake(flake) {
+            const duration = Math.random() * 10 + 5;
+            const delay = Math.random() * 5;
+            const left = Math.random() * 100;
+            
+            flake.style.animation = `fall ${duration}s linear ${delay}s infinite`;
+            
+            // Add keyframes dynamically
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fall {
+                    0% { 
+                        transform: translateY(-100px) translateX(0); 
+                        opacity: ${Math.random() * 0.5 + 0.3};
+                    }
+                    100% { 
+                        transform: translateY(100vh) translateX(${Math.random() * 50 - 25}px); 
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Event listeners
+        document.getElementById('answer-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        
+        // Initialize the game when page loads
+        window.onload = initGame;
+    </script>
+    <script type="module">
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+  import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
+
+  let scene, camera, renderer;
+  let penguins = [];
+  let vases = [];
+
+  init3D();
+  loadPenguinsAndVases();
+
+  function init3D() {
+    const container = document.getElementById("game-area");
+
+    scene = new THREE.Scene();
+    scene.background = null;
+
+    camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
+    camera.position.set(0, 2, 6);
+
+    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.domElement.style.position = "absolute";
+    renderer.domElement.style.bottom = "0";
+    renderer.domElement.style.left = "0";
+    renderer.domElement.style.zIndex = "0";
+    container.appendChild(renderer.domElement);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 1);
+    const dir = new THREE.DirectionalLight(0xffffff, 1);
+    dir.position.set(5, 10, 5);
+    scene.add(ambient, dir);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+    animate();
+  }
+
+  function loadPenguinsAndVases() {
+    const loader = new GLTFLoader();
+    const penguinURL = "https://github.com/bryagisubizo-bit/penguin-game-assets/raw/main/penguin.glb";
+
+    for (let v = 0; v < 4; v++) {
+      const vaseGroup = new THREE.Group();
+      const body = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.6, 0.8, 1.5, 32),
+        new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.3, roughness: 0.5 })
+      );
+      const lid = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.62, 0.62, 0.1, 32),
+        new THREE.MeshStandardMaterial({ color: 0x555555 })
+      );
+      lid.position.y = 0.75;
+      vaseGroup.add(body, lid);
+      vaseGroup.position.set((v - 1.5) * 2.5, -1.2, 0);
+      scene.add(vaseGroup);
+      vases.push({ group: vaseGroup, lid, opened: false });
+    }
+
+    // Penguins (2 per vase)
+    for (let i = 0; i < 8; i++) {
+      loader.load(penguinURL, (gltf) => {
+        const penguin = gltf.scene;
+        penguin.scale.set(0.4, 0.4, 0.4);
+        const vaseIndex = Math.floor(i / 2);
+        penguin.position.set((vaseIndex - 1.5) * 2.5, -1.4 + (i % 2) * 0.5, 0);
+        scene.add(penguin);
+        penguins.push({ mesh: penguin, vaseIndex });
+      });
+    }
+  }
+
+  // 👉 function yitwa freePenguin ikoreshwa igihe user atsindiye
+  window.freePenguin = function () {
+    if (penguins.length === 0) return;
+    const { mesh, vaseIndex } = penguins.shift();
+    const vase = vases[vaseIndex];
+    if (!vase || vase.opened) return;
+
+    vase.opened = true;
+    const lid = vase.lid;
+    let angle = 0;
+    const open = () => {
+      if (angle < Math.PI / 3) {
+        angle += 0.03;
+        lid.rotation.x = -angle;
+        requestAnimationFrame(open);
+      }
+    };
+    open();
+
+    const rise = () => {
+      if (mesh.position.y < 1) {
+        mesh.position.y += 0.02;
+        requestAnimationFrame(rise);
+      }
+    };
+    rise();
+  };
+</script>
+</body>
+</html>

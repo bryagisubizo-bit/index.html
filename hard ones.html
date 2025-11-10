@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>🐧 Penguin Rescue – Hard Mode (Fixed Submit) 🧊</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif;}
+    body {
+      background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      min-height:100vh; display:flex; justify-content:center; align-items:center;
+      overflow:hidden;
+    }
+
+    /* Snow background */
+    .snow { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; z-index:0; }
+    .snow span { position:absolute; top:-10px; background:white; border-radius:50%; opacity:0.85; animation: fall linear infinite; }
+    @keyframes fall { to { transform: translateY(110vh); opacity:0.3; } }
+
+    .game-container {
+      width:90%; max-width:900px; height:100vh;
+      background:rgba(255,255,255,0.06); backdrop-filter:blur(8px);
+      border-radius:18px; box-shadow:0 15px 35px rgba(0,0,0,0.45);
+      overflow:hidden; position:relative; z-index:1;
+    }
+
+    .header { background:rgba(255,255,255,0.06); padding:18px; text-align:center; }
+    .header h1 { color:white; font-size:2.2rem; text-shadow:0 2px 10px rgba(0,0,0,0.3); }
+    .stats { display:flex; justify-content:space-around; color:white; font-size:1.05rem; margin-top:8px; }
+
+    .game-area { height:calc(100% - 120px); position:relative; overflow:hidden; }
+
+    .question {
+      position:absolute;
+      top:-120px;
+      background:white;
+      padding:18px 28px;
+      border-radius:14px;
+      font-size:1.9rem;
+      font-weight:700;
+      color:#17223b;
+      box-shadow:0 10px 25px rgba(0,0,0,0.35);
+      animation: drop 4s linear forwards;
+      transition: transform .18s ease, opacity .18s ease;
+      pointer-events:none;
+      white-space:nowrap;
+    }
+    @keyframes drop { to { top:75%; opacity:0.95; } }
+
+    /* visual feedback */
+    .question.correct { background:#dff7e1; transform: scale(1.08); }
+    .question.incorrect { background:#ffdce0; animation: shake .5s; opacity:0.9; }
+    @keyframes shake {
+      0% { transform: translateX(0) }
+      20% { transform: translateX(-10px) }
+      40% { transform: translateX(8px) }
+      60% { transform: translateX(-6px) }
+      80% { transform: translateX(4px) }
+      100% { transform: translateX(0) }
+    }
+    .input-area input {
+      padding:14px 18px; font-size:1.25rem; border:none; border-radius:12px; width:160px;
+      text-align:center; box-shadow:0 6px 18px rgba(0,0,0,0.35); outline:none;
+    }
+    .input-area button {
+      padding:12px 20px; font-size:1.05rem; background:#ff4757; color:white; border:none; border-radius:12px; cursor:pointer;
+      box-shadow:0 6px 18px rgba(0,0,0,0.35); transition: all .18s ease;
+    }
+    .input-area button:hover { transform:translateY(-3px); background:#e84118; }
+
+    .message {
+      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+      background:white; padding:26px 40px; border-radius:14px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.4);
+      opacity:0; pointer-events:none; transition:opacity .25s;
+      z-index:4;
+    }
+    .message.show { opacity:1; pointer-events:auto; }
+
+    .penguin-image { position:absolute; bottom:18px; left:18px; width:110px; height:110px; z-index:2; }
+    .penguin-image img { width:100%; height:100%; object-fit:contain; }
+
+    .stats small { display:block; font-weight:600; color:#e6eef8; }
+.input-area {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center; /* ✅ centers input + button together */
+  align-items: center;     /* ✅ vertically aligns them */
+  gap: 10px;               /* ✅ small space between input & button */
+}
+/* 🏠 Home Button Styling */
+.home-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  font-size: 1.8rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 9999;
+}
+.home-button:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+}
+  </style>
+</head>
+<body>
+  <!-- 🏠 Home Button -->
+<button id="home-btn" class="home-button" title="Go Home">🏠</button>
+  <div class="snow" id="snow"></div>
+
+  <div class="game-container" id="container">
+    <div class="header">
+      <h1>🐧 Penguin Rescue – Hard Mode 🧊</h1>
+      <div class="stats">
+        <div>Questions: <span id="question-count">0</span>/10</div>
+        <div>Correct: <span id="correct-count">0</span></div>
+        <div>Penguins Free: <span id="penguin-count">0</span></div>
+      </div>
+    </div>
+
+    <div class="game-area" id="game-area">
+      <div class="penguin-image">
+        <img src="https://pfst.cf2.poecdn.net/base/image/74f24b026c77420015a92aa45e28629d5c10d0d5657043469463be18d231f0f0?w=512&h=512" alt="Penguin"/>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <input id="answer-input" type="text" inputmode="numeric" placeholder="Type answer & press Enter" />
+      <button id="submit-btn" type="button">Submit</button>
+    </div>
+
+    <div class="message" id="message">
+      <h2 id="message-title">Game Over!</h2>
+      <p id="message-text">You freed <strong id="freed-penguins">0</strong> penguins!</p>
+      <button id="restart-btn">Try Again</button>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Game state ----------
+    let questions = [];
+    let currentIndex = 0;           // how many questions have been created (1-based count shown)
+    let correctCount = 0;
+    let freedCount = 0;
+    let gameActive = true;
+    let questionTimer = null;
+
+    const TOTAL_QUESTIONS = 10;
+    const DROP_DURATION_MS = 4000; // must match animation time
+
+    // ---------- Utilities ----------
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+    // small tolerance for floats (division)
+    const EPS = 1e-6;
+    function nearlyEqual(a, b) { return Math.abs(a - b) < EPS; }
+
+    // ---------- Snow ----------
+    function generateSnowflakes() {
+      const snow = document.getElementById('snow');
+      for (let i = 0; i < 60; i++) {
+        const s = document.createElement('span');
+        const size = Math.random() * 6 + 2;
+        s.style.width = `${size}px`;
+        s.style.height = `${size}px`;
+        s.style.left = `${Math.random() * 100}%`;
+        s.style.opacity = (Math.random() * 0.6 + 0.3).toFixed(2);
+        s.style.animationDuration = `${Math.random() * 5 + 5}s`;
+        s.style.animationDelay = `${Math.random() * 5}s`;
+        snow.appendChild(s);
+      }
+    }
+
+    // ---------- Question generation ----------
+    // ensures division yields whole (int) answers
+    function generateHardQuestionsPool(count = 20) {
+      const pool = [];
+      const ops = ['+', '-', '*', '/'];
+      while (pool.length < count) {
+        const op = ops[Math.floor(Math.random() * ops.length)];
+        let a = randInt(1, 20);
+        let b = randInt(1, 20);
+
+        if (op === '/') {
+          // make a divisible
+          a = a * b; // a / b -> integer b
+        }
+        if (op === '-' && b > a) [a, b] = [b, a];
+
+        // compute answer without using eval for safety
+        let ans;
+        if (op === '+') ans = a + b;
+        else if (op === '-') ans = a - b;
+        else if (op === '*') ans = a * b;
+        else ans = a / b;
+
+        pool.push({ q: `${a} ${op} ${b} = ?`, a: ans });
+      }
+      return pool;
+    }
+
+    // ---------- Create & drop questions ----------
+    function createQuestionElement(item) {
+      const el = document.createElement('div');
+      el.className = 'question';
+      el.textContent = item.q;
+      el.dataset.answer = String(item.a);
+      // random horizontal position within game-area (avoid edges)
+      el.style.left = `${Math.random() * 70 + 8}%`;
+      return el;
+    }
+
+    // create next question and schedule next
+    function spawnNextQuestion() {
+      if (!gameActive) return;
+      if (currentIndex >= TOTAL_QUESTIONS) {
+        // no more questions to spawn
+        // but let any remaining ones fall / be answered
+        // schedule final check after last drop time
+        setTimeout(() => {
+          if (gameActive) endGame();
+        }, DROP_DURATION_MS + 250);
+        return;
+      }
+
+      const item = questions[currentIndex];
+      const el = createQuestionElement(item);
+      document.getElementById('game-area').appendChild(el);
+
+      // remove the question automatically when it finishes falling (if still present)
+      const removalTimeout = setTimeout(() => {
+        if (el && el.parentElement) {
+          el.remove();
+        }
+      }, DROP_DURATION_MS);
+
+      currentIndex++;
+      document.getElementById('question-count').textContent = currentIndex;
+
+      // schedule next spawn
+      questionTimer = setTimeout(spawnNextQuestion, DROP_DURATION_MS);
+    }
+
+    // ---------- Answer checking ----------
+    function findActiveQuestion() {
+      // choose the earliest created active question (.question present in DOM and not answered)
+      return document.querySelector('.question'); // first in DOM is the oldest
+    }
+
+    function checkAnswer() {
+      if (!gameActive) return;
+      const input = document.getElementById('answer-input');
+      let value = input.value.trim();
+      if (value === '') {
+        input.focus();
+        return;
+      }
+
+      // allow decimals and commas (comma -> dot)
+      value = value.replace(',', '.');
+
+      const numeric = Number(value);
+      if (Number.isNaN(numeric)) {
+        // invalid numeric input — clear and focus
+        input.value = '';
+        input.focus();
+        return;
+      }
+
+      const qEl = findActiveQuestion();
+      if (!qEl) {
+        // nothing to answer right now
+        input.value = '';
+        input.focus();
+        return;
+      }
+
+      const correctAns = parseFloat(qEl.dataset.answer);
+      qEl.classList.add('answered'); // mark so timers won't treat it as active
+
+      if (nearlyEqual(numeric, correctAns)) {
+        // correct
+        qEl.classList.add('correct');
+        correctCount++;
+        freedCount++;
+        updateStats();
+        // remove with a short delay so player sees feedback
+        setTimeout(() => { qEl.remove(); }, 200);
+      } else {
+        // incorrect
+        qEl.classList.add('incorrect');
+        // remove after short feedback
+        setTimeout(() => { qEl.remove(); }, 550);
+      }
+
+      // clear + focus input for next answer
+      input.value = '';
+      input.focus();
+
+      // If we've spawned all questions and all have been answered/removed, end game
+      // (Count removed/answered by summing freed + incorrect removals isn't tracked,
+      // but we can detect when DOM has no .question and currentIndex >= TOTAL_QUESTIONS)
+      setTimeout(() => {
+        const stillQuestions = document.querySelectorAll('.question').length;
+        if (currentIndex >= TOTAL_QUESTIONS && stillQuestions === 0) {
+          endGame();
+        }
+      }, 600);
+    }
+
+    // ---------- Stats, end and restart ----------
+    function updateStats() {
+      document.getElementById('correct-count').textContent = correctCount;
+      document.getElementById('penguin-count').textContent = freedCount;
+    }
+
+    function endGame() {
+      if (!gameActive) return;
+      gameActive = false;
+      clearTimeout(questionTimer);
+      document.getElementById('freed-penguins').textContent = freedCount;
+      const title = freedCount >= Math.ceil(TOTAL_QUESTIONS / 2) ? 'Impressive!' : 'Keep Training!';
+      document.getElementById('message-title').textContent = title;
+      document.getElementById('message').classList.add('show');
+    }
+
+    function restartGame() {
+      // reset
+      gameActive = true;
+      currentIndex = 0;
+      correctCount = 0;
+      freedCount = 0;
+      document.getElementById('question-count').textContent = '0';
+      updateStats();
+      // clear area and re-add penguin image
+      const gameArea = document.getElementById('game-area');
+      gameArea.innerHTML = `<div class="penguin-image"><img src="https://pfst.cf2.poecdn.net/base/image/74f24b026c77420015a92aa45e28629d5c10d0d5657043469463be18d231f0f0?w=512&h=512" alt="Penguin"/></div>`;
+      // recreate question pool and start spawning
+      questions = generateHardQuestionsPool(20);
+      document.getElementById('message').classList.remove('show');
+      // small delay before first spawn for user prep
+      setTimeout(spawnNextQuestion, 900);
+      // focus input
+      const input = document.getElementById('answer-input');
+      input.value = '';
+      input.focus();
+    }
+
+    // ---------- Input handlers ----------
+    function attachInputHandlers() {
+      const input = document.getElementById('answer-input');
+      const submitBtn = document.getElementById('submit-btn');
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          checkAnswer();
+        }
+      });
+      submitBtn.addEventListener('click', (e) => {
+        checkAnswer();
+      });
+
+      document.getElementById('restart-btn').addEventListener('click', restartGame);
+    }
+
+    // ---------- Boot ----------
+    window.addEventListener('load', () => {
+      generateSnowflakes();
+      attachInputHandlers();
+      questions = generateHardQuestionsPool(20);
+      // short startup delay then spawn
+      setTimeout(spawnNextQuestion, 900);
+      // focus input for quick typing
+      setTimeout(() => { document.getElementById('answer-input').focus(); }, 1200);
+    });
+// 🏠 Go Home instantly
+document.getElementById("home-btn").addEventListener("click", () => {
+  window.location.href = "file:///F:/loading%20game.html";
+});
+  </script>
+</body>
+</html>

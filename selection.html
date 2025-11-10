@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Difficulty</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            text-align: center;
+        }
+        /* Enhanced styling for container and elements */
+.container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  padding: 50px 70px;
+  backdrop-filter: blur(10px);
+  transition: all 0.4s ease;
+}
+
+.container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+}
+
+h1 {
+  font-size: 2.3rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #00eaff, #ff00ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 35px;
+  letter-spacing: 1px;
+  animation: pulseTitle 2s infinite ease-in-out;
+}
+
+@keyframes pulseTitle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.03); }
+}
+
+button {
+  background: linear-gradient(90deg, #ff3b3b, #ff9100);
+  border: none;
+  color: white;
+  padding: 14px 30px;
+  margin: 15px;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 6px 12px rgba(255, 0, 0, 0.3);
+}
+
+button:hover {
+  transform: scale(1.12);
+  background: linear-gradient(90deg, #ff9100, #ff3b3b);
+  box-shadow: 0 0 25px rgba(255, 80, 0, 0.8);
+}
+
+button:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(255, 0, 0, 0.4);
+}
+
+footer {
+  font-size: 0.95rem;
+  color: #ccc;
+  margin-top: 30px;
+  letter-spacing: 0.5px;
+  animation: glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 5px #ff3b3b, 0 0 10px #ff9100; }
+  to { text-shadow: 0 0 15px #ff3b3b, 0 0 25px #ff9100; }
+}
+
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        .difficulty-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 1.2rem;
+            color: white;
+            background: linear-gradient(90deg, #ff416c, #ff4b2b);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .difficulty-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🐧 Select Difficulty</h1>
+    <footer>Created with ❤️ for Penguin Rescue</footer>
+    <button onclick="selectMode('easymode.html')">Easy Mode</button>
+<button onclick="selectMode('medium.html')">Medium Mode</button>
+<button onclick="selectMode('hard%20ones.html')">Hard Mode</button>
+
+<script>
+  function selectMode(page) {
+    window.location.href = page; // Ibi bihita bifungura page watoranyije
+  }
+</script>
+
+  </div>
+
+  <script>
+    // Redirects based on difficulty
+    function setDifficulty(level) {
+      if (level === 'file:///F:/easymode.html') {
+        window.location.href = 'file:///F:/easymode.html';
+      } else if (level === 'medium') {
+        window.location.href = 'file:///F:/medium.html';
+      } else if (level === 'hard') {
+        window.location.href = 'file:///F:/hard%20ones.html';
+      }
+    }
+
+    // Custom redirect via input
+    function goToCustom() {
+      const url = document.getElementById('customPage').value.trim();
+      if (url) {
+        window.location.href = url;
+      } else {
+        alert('Please enter a page URL or filename.');
+      }
+    }
+
+    // Allow pressing Enter to trigger "Go"
+    document.getElementById('customPage').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') goToCustom();
+    });
+  </script>
+
+<script>
+    function setDifficulty(level) {
+        alert(`You selected ${level.charAt(0).toUpperCase() + level.slice(1)} mode!`);
+        // Here you can add logic to start the game in the selected difficulty
+    }
+</script>
+
+</body>
+</html>

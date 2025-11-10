@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Boost Adventures - Educational Games</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+body {
+    font-family: 'Comic Neue', cursive;
+    background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+    min-height: 100vh;
+    overflow-y: auto; /* ✅ Enables vertical scrolling */
+    overflow-x: hidden; /* Optional: prevents sideways scrolling */
+    color: white;
+    position: relative;
+}
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            animation: fadeInDown 1s ease-out;
+        }
+        
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0 #ff6b6b, 6px 6px 0 rgba(0,0,0,0.1);
+            background: linear-gradient(to right, #ffd166, #06d6a0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #ffd166;
+        }
+        
+        .games-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #ffd166, #06d6a0, #118ab2);
+        }
+        
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        .game-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #ffd166;
+        }
+        
+        .game-description {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .play-btn {
+            background: linear-gradient(to right, #ff6b6b, #ff8e53);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
+        }
+        
+        .game-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        .game-screen.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+        
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .game-content {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .game-title-large {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #ffd166;
+        }
+        
+        .game-instructions {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .memory-game {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto 30px;
+        }
+        
+        .card {
+            aspect-ratio: 1;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+        }
+        
+        .card.matched {
+            opacity: 0.6;
+            cursor: default;
+        }
+        
+        .memory-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .timer, .moves {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        
+        .result-message {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            min-height: 40px;
+        }
+        
+        .try-again-btn {
+            background: linear-gradient(to right, #06d6a0, #118ab2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        
+        .try-again-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(6, 214, 160, 0.4);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .game-card {
+                padding: 20px;
+            }
+            
+            .game-title {
+                font-size: 1.5rem;
+            }
+            
+            .memory-game {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        /* New Style for Improved Visual Design */
+        .game-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .game-card:hover {
+            transform: translateY(-15px) scale(1.02);
+        }
+        
+        .memory-game {
+            gap: 20px;
+        }
+        
+        .card {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card.flipped {
+            box-shadow: 0 12px 30px rgba(255, 107, 107, 0.5);
+        }
+        
+        .result-message {
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .try-again-btn {
+            background: linear-gradient(to right, #06d6a0, #118ab2);
+            box-shadow: 0 6px 20px rgba(6, 214, 160, 0.4);
+            font-family: 'Fredoka One', cursive;
+            letter-spacing: 2px;
+        }
+        
+        .try-again-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 10px 25px rgba(6, 214, 160, 0.6);
+        }
+        
+        h1 {
+            text-shadow: 4px 4px 0 #ff6b6b, 8px 8px 0 rgba(0,0,0,0.15);
+        }
+        
+        .game-title {
+            color: #ffd166;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .game-description {
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .game-screen {
+            backdrop-filter: blur(5px);
+        }
+        
+        .memory-stats {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .game-instructions {
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .play-btn {
+            background: linear-gradient(to right, #ff6b6b, #ff8e53);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+            font-family: 'Fredoka One', cursive;
+            letter-spacing: 1px;
+        }
+        
+        .play-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.7);
+        }
+        
+        /* New Game Styles */
+        .minesweeper-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 3px;
+            max-width: 400px;
+            margin: 0 auto 30px;
+        }
+        
+        .cell {
+            aspect-ratio: 1;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+        }
+        
+        .cell.revealed {
+            background: linear-gradient(45deg, #ffd166, #ff9a8b);
+        }
+        
+        .cell.mine {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+        }
+        
+        .cell.flagged::after {
+            content: '🚩';
+        }
+        
+        .minesweeper-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .mines, .flags {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        
+        .difficulty-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .difficulty-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .difficulty-btn.active {
+            background: linear-gradient(to right, #06d6a0, #118ab2);
+        }
+        
+        .difficulty-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 Brain Boost Adventures 🧠</h1>
+            <p class="subtitle">Fun educational games to keep your mind sharp!</p>
+        </header>
+        
+        <div class="games-container">
+            <div class="game-card" onclick="openGame('memory')">
+                <div class="game-icon">🧠</div>
+                <h2 class="game-title">Memory Match</h2>
+                <p class="game-description">Test your memory skills by finding matching pairs of cards. Perfect for improving concentration and recall abilities!</p>
+                <button class="play-btn">Play Now</button>
+            </div>
+            
+            <div class="game-card" onclick="openGame('quiz')">
+                <div class="game-icon">❓</div>
+                <h2 class="game-title">Quick Quiz</h2>
+                <p class="game-description">Answer fun questions about science, math, and general knowledge. Challenge yourself and learn something new!</p>
+                <button class="play-btn">Play Now</button>
+            </div>
+            
+            <div class="game-card" onclick="openGame('puzzle')">
+                <div class="game-icon">🧩</div>
+                <h2 class="game-title">Logic Puzzles</h2>
+                <p class="game-description">Solve fun logic puzzles that challenge your problem-solving skills and critical thinking abilities!</p>
+                <button class="play-btn">Play Now</button>
+            </div>
+            
+            <div class="game-card" onclick="openGame('minesweeper')">
+                <div class="game-icon">💣</div>
+                <h2 class="game-title">Minesweeper</h2>
+                <p class="game-description">Classic strategy game where you locate mines without detonating them. Test your logical deduction skills!</p>
+                <button class="play-btn">Play Now</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Memory Game Screen -->
+    <div id="memoryGameScreen" class="game-screen">
+        <div class="game-header">
+            <button class="close-btn" onclick="closeGame('memory')">✕</button>
+            <h2 class="game-title-large">Memory Match</h2>
+            <div></div>
+        </div>
+        <div class="game-content">
+            <p class="game-instructions">Find all matching pairs of cards. Flip two cards at a time to find matches!</p>
+            <div class="memory-stats">
+                <div class="timer">Time: <span id="memoryTimer">0</span>s</div>
+                <div class="moves">Moves: <span id="memoryMoves">0</span></div>
+            </div>
+            <div class="memory-game" id="memoryGameBoard"></div>
+            <div class="result-message" id="memoryResult"></div>
+            <button class="try-again-btn" onclick="resetMemoryGame()">Try Again</button>
+        </div>
+    </div>
+    
+    <!-- Quiz Game Screen -->
+    <div id="quizGameScreen" class="game-screen">
+        <div class="game-header">
+            <button class="close-btn" onclick="closeGame('quiz')">✕</button>
+            <h2 class="game-title-large">Quick Quiz</h2>
+            <div></div>
+        </div>
+        <div class="game-content">
+            <p class="game-instructions">Answer the questions below. Each correct answer earns you points!</p>
+            <div id="quizContent"></div>
+            <div class="result-message" id="quizResult"></div>
+            <button class="try-again-btn" onclick="resetQuizGame()">Try Again</button>
+        </div>
+    </div>
+    
+    <!-- Puzzle Game Screen -->
+    <div id="puzzleGameScreen" class="game-screen">
+        <div class="game-header">
+            <button class="close-btn" onclick="closeGame('puzzle')">✕</button>
+            <h2 class="game-title-large">Logic Puzzles</h2>
+            <div></div>
+        </div>
+        <div class="game-content">
+            <p class="game-instructions">Solve the logic puzzle. Use your reasoning skills to figure out the solution!</p>
+            <div class="logic-puzzle" id="puzzleContent">
+                <p style="font-size: 1.2rem; margin: 20px 0;">Can you solve this classic riddle?</p>
+                <p style="font-size: 1.1rem; margin-bottom: 20px;">I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?</p>
+                <input type="text" id="puzzleAnswer" placeholder="Enter your answer..." style="padding: 10px; width: 300px; margin: 20px 0; border-radius: 5px; border: 1px solid #ccc;">
+                <button class="try-again-btn" onclick="checkPuzzleAnswer()">Submit Answer</button>
+            </div>
+            <div class="result-message" id="puzzleResult"></div>
+        </div>
+    </div>
+    
+    <!-- Minesweeper Game Screen -->
+    <div id="minesweeperGameScreen" class="game-screen">
+        <div class="game-header">
+            <button class="close-btn" onclick="closeGame('minesweeper')">✕</button>
+            <h2 class="game-title-large">Minesweeper</h2>
+            <div></div>
+        </div>
+        <div class="game-content">
+            <p class="game-instructions">Left-click to reveal cells, right-click to flag suspected mines. Find all mines without detonating them!</p>
+            <div class="difficulty-buttons">
+                <button class="difficulty-btn active" onclick="setDifficulty('easy')">Easy</button>
+                <button class="difficulty-btn" onclick="setDifficulty('medium')">Medium</button>
+                <button class="difficulty-btn" onclick="setDifficulty('hard')">Hard</button>
+            </div>
+            <div class="minesweeper-stats">
+                <div class="mines">Mines: <span id="mineCount">10</span></div>
+                <div class="flags">Flags: <span id="flagCount">0</span></div>
+            </div>
+            <div class="minesweeper-board" id="minesweeperBoard"></div>
+            <div class="result-message" id="minesweeperResult"></div>
+            <button class="try-again-btn" onclick="resetMinesweeperGame()">New Game</button>
+        </div>
+    </div>
+    
+    <script>
+        // Memory Game Implementation
+        let memoryCards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+        let timer = 0;
+        let timerInterval;
+        let isChecking = false;
+        
+        const memoryGameBoard = document.getElementById('memoryGameBoard');
+        const memoryTimer = document.getElementById('memoryTimer');
+        const memoryMoves = document.getElementById('memoryMoves');
+        const memoryResult = document.getElementById('memoryResult');
+        
+        // Memory game data
+        const memorySymbols = ['🍎', '🍌', '🍒', '🍇', '🍊', '🍓', '🍑', '🥝'];
+        const memoryPairs = [...memorySymbols, ...memorySymbols];
+        
+        function initializeMemoryGame() {
+            // Reset game state
+            memoryCards = [];
+            flippedCards = [];
+            matchedPairs = 0;
+            moves = 0;
+            timer = 0;
+            clearInterval(timerInterval);
+            
+            // Update UI
+            memoryTimer.textContent = timer;
+            memoryMoves.textContent = moves;
+            memoryResult.textContent = '';
+            
+            // Clear board
+            memoryGameBoard.innerHTML = '';
+            
+            // Shuffle cards
+            const shuffledCards = [...memoryPairs].sort(() => Math.random() - 0.5);
+            
+            // Create cards
+            shuffledCards.forEach((symbol, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.symbol = symbol;
+                card.dataset.index = index;
+                card.innerHTML = '<span style="opacity: 0;">' + symbol + '</span>';
+                
+                card.addEventListener('click', () => flipCard(card));
+                memoryGameBoard.appendChild(card);
+                memoryCards.push(card);
+            });
+            
+            // Start timer
+            timerInterval = setInterval(() => {
+                timer++;
+                memoryTimer.textContent = timer;
+            }, 1000);
+        }
+        
+        function flipCard(card) {
+            if (isChecking || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+            
+            if (flippedCards.length < 2) {
+                card.classList.add('flipped');
+                flippedCards.push(card);
+                
+                if (flippedCards.length === 2) {
+                    isChecking = true;
+                    moves++;
+                    memoryMoves.textContent = moves;
+                    
+                    const [firstCard, secondCard] = flippedCards;
+                    
+                    if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
+                        // Match found
+                        firstCard.classList.add('matched');
+                        secondCard.classList.add('matched');
+                        matchedPairs++;
+                        
+                        flippedCards = [];
+                        isChecking = false;
+                        
+                        if (matchedPairs === memoryPairs.length / 2) {
+                            endMemoryGame();
+                        }
+                    } else {
+                        // No match
+                        setTimeout(() => {
+                            firstCard.classList.remove('flipped');
+                            secondCard.classList.remove('flipped');
+                            flippedCards = [];
+                            isChecking = false;
+                        }, 1000);
+                    }
+                }
+            }
+        }
+        
+        function endMemoryGame() {
+            clearInterval(timerInterval);
+            memoryResult.textContent = `Congratulations! You completed the game in ${timer} seconds with ${moves} moves!`;
+            memoryResult.style.color = '#06d6a0';
+        }
+        
+        function resetMemoryGame() {
+            initializeMemoryGame();
+        }
+        
+        // Quiz Game Implementation
+        let quizQuestions = [
+            {
+                question: "What is the capital of France?",
+                options: ["London", "Berlin", "Paris", "Madrid"],
+                answer: 2
+            },
+            {
+                question: "How many planets are in our solar system?",
+                options: ["7", "8", "9", "10"],
+                answer: 1
+            },
+            {
+                question: "What is the chemical symbol for water?",
+                options: ["H2O", "CO2", "NaCl", "O2"],
+                answer: 0
+            },
+            {
+                question: "Which animal is known as the 'King of the Jungle'?",
+                options: ["Lion", "Tiger", "Elephant", "Giraffe"],
+                answer: 0
+            },
+            {
+                question: "How many continents are there?",
+                options: ["5", "6", "7", "8"],
+                answer: 2
+            }
+        ];
+        
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+        const quizContent = document.getElementById('quizContent');
+        const quizResult = document.getElementById('quizResult');
+        
+        function initializeQuizGame() {
+            currentQuizIndex = 0;
+            quizScore = 0;
+            quizResult.textContent = '';
+            showQuizQuestion();
+        }
+        
+        function showQuizQuestion() {
+            if (currentQuizIndex >= quizQuestions.length) {
+                endQuizGame();
+                return;
+            }
+            
+            const question = quizQuestions[currentQuizIndex];
+            let html = `<h3>${question.question}</h3><div style="margin: 20px 0;">`;
+            
+            question.options.forEach((option, index) => {
+                html += `
+                    <button style="display: block; width: 100%; margin: 10px 0; padding: 15px; background: rgba(255,255,255,0.2); border: none; border-radius: 10px; color: white; cursor: pointer;" 
+                            onclick="selectQuizOption(${index})">${option}</button>
+                `;
+            });
+            
+            html += `</div>`;
+            quizContent.innerHTML = html;
+        }
+        
+        function selectQuizOption(selectedIndex) {
+            const question = quizQuestions[currentQuizIndex];
+            if (selectedIndex === question.answer) {
+                quizScore++;
+            }
+            
+            currentQuizIndex++;
+            showQuizQuestion();
+        }
+        
+        function endQuizGame() {
+            quizResult.textContent = `Quiz Completed! Your score: ${quizScore}/${quizQuestions.length}`;
+            quizResult.style.color = quizScore >= quizQuestions.length/2 ? '#06d6a0' : '#ff6b6b';
+        }
+        
+        function resetQuizGame() {
+            initializeQuizGame();
+        }
+        
+        // Puzzle Game Implementation
+        const puzzleAnswerInput = document.getElementById('puzzleAnswer');
+        const puzzleResult = document.getElementById('puzzleResult');
+        
+        function checkPuzzleAnswer() {
+            const answer = puzzleAnswerInput.value.trim().toLowerCase();
+            if (answer.includes('echo')) {
+                puzzleResult.textContent = 'Correct! An echo is the reflection of sound waves.';
+                puzzleResult.style.color = '#06d6a0';
+            } else {
+                puzzleResult.textContent = 'Not quite right. Think about what sound waves do when they hit objects.';
+                puzzleResult.style.color = '#ff6b6b';
+            }
+        }
+        
+        // Minesweeper Game Implementation
+        let board = [];
+        let minePositions = [];
+        let revealedCells = 0;
+        let flaggedCells = 0;
+        let gameOver = false;
+        let gameStarted = false;
+        let difficulty = 'easy';
+        let totalMines = 10;
+        let boardSize = { rows: 8, cols: 8 };
+        
+        const minesweeperBoard = document.getElementById('minesweeperBoard');
+        const mineCountElement = document.getElementById('mineCount');
+        const flagCountElement = document.getElementById('flagCount');
+        const minesweeperResult = document.getElementById('minesweeperResult');
+        
+        function setDifficulty(level) {
+            difficulty = level;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            switch(level) {
+                case 'easy':
+                    totalMines = 10;
+                    boardSize = { rows: 8, cols: 8 };
+                    break;
+                case 'medium':
+                    totalMines = 25;
+                    boardSize = { rows: 12, cols: 12 };
+                    break;
+                case 'hard':
+                    totalMines = 50;
+                    boardSize = { rows: 16, cols: 16 };
+                    break;
+            }
+            
+            mineCountElement.textContent = totalMines;
+            resetMinesweeperGame();
+        }
+        
+        function initializeMinesweeperGame() {
+            // Reset game state
+            board = [];
+            minePositions = [];
+            revealedCells = 0;
+            flaggedCells = 0;
+            gameOver = false;
+            gameStarted = false;
+            minesweeperResult.textContent = '';
+            
+            // Update UI
+            flagCountElement.textContent = flaggedCells;
+            
+            // Clear board
+            minesweeperBoard.innerHTML = '';
+            minesweeperBoard.style.gridTemplateColumns = `repeat(${boardSize.cols}, 1fr)`;
+            
+            // Create board
+            for (let row = 0; row < boardSize.rows; row++) {
+                board[row] = [];
+                for (let col = 0; col < boardSize.cols; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    
+                    cell.addEventListener('click', () => handleCellClick(row, col));
+                    cell.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        handleRightClick(row, col);
+                    });
+                    
+                    minesweeperBoard.appendChild(cell);
+                    board[row][col] = {
+                        isMine: false,
+                        isRevealed: false,
+                        isFlagged: false,
+                        neighborCount: 0
+                    };
+                }
+            }
+            
+            // Place mines randomly
+            placeMines();
+        }
+        
+        function placeMines() {
+            let minesPlaced = 0;
+            while (minesPlaced < totalMines) {
+                const row = Math.floor(Math.random() * boardSize.rows);
+                const col = Math.floor(Math.random() * boardSize.cols);
+                
+                if (!board[row][col].isMine) {
+                    board[row][col].isMine = true;
+                    minePositions.push({row, col});
+                    minesPlaced++;
+                    
+                    // Update neighbor counts
+                    updateNeighborCounts(row, col);
+                }
+            }
+        }
+        
+        function updateNeighborCounts(row, col) {
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    const newRow = row + i;
+                    const newCol = col + j;
+                    
+                    if (newRow >= 0 && newRow < boardSize.rows && 
+                        newCol >= 0 && newCol < boardSize.cols) {
+                        board[newRow][newCol].neighborCount++;
+                    }
+                }
+            }
+        }
+        
+        function handleCellClick(row, col) {
+            if (gameOver || board[row][col].isRevealed || board[row][col].isFlagged) return;
+            
+            if (!gameStarted) {
+                gameStarted = true;
+            }
+            
+            const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+            
+            if (board[row][col].isMine) {
+                // Game over
+                revealAllMines();
+                gameOver = true;
+                minesweeperResult.textContent = 'Game Over! You hit a mine.';
+                minesweeperResult.style.color = '#ff6b6b';
+                return;
+            }
+            
+            revealCell(row, col);
+            
+            // Check win condition
+            if (revealedCells === (boardSize.rows * boardSize.cols) - totalMines) {
+                gameOver = true;
+                minesweeperResult.textContent = 'Congratulations! You won!';
+                minesweeperResult.style.color = '#06d6a0';
+            }
+        }
+        
+        function handleRightClick(row, col) {
+            if (gameOver || board[row][col].isRevealed) return;
+            
+            const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+            
+            if (!board[row][col].isFlagged) {
+                // Flag the cell
+                board[row][col].isFlagged = true;
+                flaggedCells++;
+                cell.classList.add('flagged');
+            } else {
+                // Remove flag
+                board[row][col].isFlagged = false;
+                flaggedCells--;
+                cell.classList.remove('flagged');
+            }
+            
+            flagCountElement.textContent = flaggedCells;
+        }
+        
+        function revealCell(row, col) {
+            if (row < 0 || row >= boardSize.rows || col < 0 || col >= boardSize.cols) return;
+            if (board[row][col].isRevealed || board[row][col].isFlagged) return;
+            
+            board[row][col].isRevealed = true;
+            revealedCells++;
+            
+            const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+            cell.classList.add('revealed');
+            
+            if (board[row][col].neighborCount > 0) {
+                cell.textContent = board[row][col].neighborCount;
+            } else {
+                // Reveal neighbors recursively
+                for (let i = -1; i <= 1; i++) {
+                    for (let j = -1; j <= 1; j++) {
+                        revealCell(row + i, col + j);
+                    }
+                }
+            }
+        }
+        
+        function revealAllMines() {
+            minePositions.forEach(pos => {
+                const cell = document.querySelector(`.cell[data-row="${pos.row}"][data-col="${pos.col}"]`);
+                if (!board[pos.row][pos.col].isFlagged) {
+                    cell.classList.add('mine');
+                    cell.textContent = '💣';
+                }
+            });
+        }
+        
+        function resetMinesweeperGame() {
+            initializeMinesweeperGame();
+        }
+        
+        // Game management functions
+        function openGame(gameType) {
+            document.getElementById(`${gameType}GameScreen`).classList.add('active');
+            
+            switch(gameType) {
+                case 'memory':
+                    initializeMemoryGame();
+                    break;
+                case 'quiz':
+                    initializeQuizGame();
+                    break;
+                case 'puzzle':
+                    puzzleResult.textContent = '';
+                    break;
+                case 'minesweeper':
+                    initializeMinesweeperGame();
+                    break;
+            }
+        }
+        
+        function closeGame(gameType) {
+            document.getElementById(`${gameType}GameScreen`).classList.remove('active');
+        }
+        
+        // Create floating particles
+        function createParticles() {
+            const container = document.querySelector('.container');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 20 + 5 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDuration = Math.random() * 5 + 5 + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(particle);
+            }
+        }
+        
+        // Initialize particles
+        createParticles();
+        
+        // Add floating animations to game cards
+        document.querySelectorAll('.game-card').forEach((card, index) => {
+            card.classList.add('floating');
+            card.style.animationDelay = index * 0.2 + 's';
+        });
+    </script>
+</body>
+</html>

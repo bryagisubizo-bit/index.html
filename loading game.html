@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Start</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: radial-gradient(circle at top, #1a1a2e, #16213e);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+  }
+
+  .glow {
+    color: #fff;
+    font-size: 3rem;
+    text-shadow: 0 0 10px #00f7ff, 0 0 20px #00f7ff, 0 0 30px #00f7ff;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { text-shadow: 0 0 10px #00f7ff; }
+    50% { text-shadow: 0 0 20px #00f7ff, 0 0 40px #00f7ff; }
+  }
+
+  .start-btn {
+    margin-top: 30px;
+    padding: 15px 40px;
+    background: linear-gradient(90deg, #00f7ff, #00ff99);
+    border: none;
+    border-radius: 50px;
+    color: #0f0f0f;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 20px #00f7ff;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+  }
+
+  .start-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px #00ffcc;
+  }
+
+  .particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+  }
+
+  .particle {
+    position: absolute;
+    background: rgba(0, 255, 255, 0.7);
+    border-radius: 50%;
+    animation: float 10s infinite ease-in-out;
+  }
+
+  @keyframes float {
+    from { transform: translateY(100vh) scale(0); opacity: 1; }
+    to { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
+  /* ⚙️ Settings Button */
+.settings-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  font-size: 1.8rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 9999;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.settings-button:hover {
+  background: rgba(255,255,255,0.4);
+  transform: rotate(45deg);
+}
+
+/* ⚙️ Settings Menu */
+.settings-menu {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 15px;
+  padding: 15px 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  display: none;
+  z-index: 9999;
+  color: #333;
+  font-size: 1rem;
+}
+.settings-menu h3 {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.settings-menu button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  background: #6a5acd;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.settings-menu button:hover {
+  background: #5d3fd3;
+}
+/* 🏠 Home Button Styling */
+.home-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  font-size: 1.8rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 9999;
+}
+.home-button:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+}
+.quote-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  color: #00f7ff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-shadow: 0 0 15px #00f7ff;
+}
+</style>
+</head>
+<body>
+  <!-- 🏠 Home Button -->
+<button id="home-btn" class="home-button" title="Go Home">🏠</button>
+  <!-- ⚙️ Global Settings Button -->
+<button id="settings-btn" class="settings-button" title="Settings">
+  ⚙️
+</button>
+
+<!-- ⚙️ Hidden Settings Menu -->
+<div id="settings-menu" class="settings-menu">
+  <h3>Settings</h3>
+  <label>
+    <input type="checkbox" id="sound-toggle" checked> 🔊 Sound
+  </label><br>
+  <label>
+    <input type="checkbox" id="music-toggle" checked> 🎵 Background Music
+  </label><br>
+  <button id="close-settings">Close</button>
+</div>
+<div class="particles"></div>
+<div style="text-align:center;">
+  <div class="glow">🚀 Welcome to the Game!</div>
+  <!-- ✨ Motivational Quotes (insert here) -->
+  <div class="quote-container">
+    <p class="quote">“There is you in you who makes you you.”</p>
+    <p class="quote">“Success starts when you study what others ignore.”</p>
+    <p class="quote">“Study now, so your future self says thank you.”</p>
+  </div>
+
+  <a href="selection.html">
+    <button class="start-btn">Start Game</button>
+  </a>
+  <p></p><strong><b><u><font-color="gray"><a href="file:///C:/Users/User/Documents/penguin%20game.html">Launch Game</a></font-color></u></b></strong>
+</div>
+</a></font-color></b></strong>
+
+<script>
+  // Particle effect
+  const particlesContainer = document.querySelector('.particles');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.classList.add('particle');
+    p.style.width = p.style.height = `${Math.random() * 10 + 5}px`;
+    p.style.left = `${Math.random() * 100}%`;
+    p.style.animationDuration = `${Math.random() * 5 + 5}s`;
+    p.style.animationDelay = `${Math.random() * 5}s`;
+    particlesContainer.appendChild(p);
+  }
+
+  // Start button logic
+  function startGame() {
+    document.body.innerHTML = '<h1 style="color:white;text-align:center;margin-top:40vh;">🎮 Game Starting...</h1>';
+    setTimeout(() => {
+      // Replace this with your actual game start logic
+      alert("Game loaded!");
+    }, 2000);
+  }
+  // ⚙️ Global settings toggle
+const settingsBtn = document.getElementById("settings-btn");
+const settingsMenu = document.getElementById("settings-menu");
+const closeSettings = document.getElementById("close-settings");
+
+settingsBtn.addEventListener("click", () => {
+  settingsMenu.style.display = settingsMenu.style.display === "block" ? "none" : "block";
+});
+
+closeSettings.addEventListener("click", () => {
+  settingsMenu.style.display = "none";
+});
+
+// Example settings toggles (you can connect to your sounds or music later)
+document.getElementById("sound-toggle").addEventListener("change", e => {
+  console.log("Sound is now:", e.target.checked ? "ON" : "OFF");
+});
+
+document.getElementById("music-toggle").addEventListener("change", e => {
+  console.log("Music is now:", e.target.checked ? "ON" : "OFF");
+});
+// 🏠 Go Home instantly
+document.getElementById("home-btn").addEventListener("click", () => {
+  window.location.href = "file:///F:/opening%20article.html";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="rw">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Guest House — Frontend Demo (Single File)</title>
+  <style>
+    /* ===== Reset & base ===== */
+    :root{
+      --accent:#1e88e5;
+      --muted:#6b7280;
+      --bg:linear-gradient(135deg,#f8fafc,#f1f5f9);
+      --card:#ffffff;
+      --glass: rgba(255,255,255,0.7);
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;color:#0f172a;margin:0;background:var(--bg);-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    header{backdrop-filter: blur(6px);background:rgba(255,255,255,0.6);position:sticky;top:0;z-index:30;border-bottom:1px solid rgba(15,23,42,0.06)}
+    .container{max-width:1100px;margin:0 auto;padding:20px}
+    nav{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .nav-left{display:flex;gap:12px;align-items:center}
+    .logo{display:flex;gap:8px;align-items:center;font-weight:700}
+    .logo .dot{width:12px;height:12px;background:var(--accent);border-radius:50%}
+    .nav-links{display:flex;gap:10px}
+    .nav-links button{background:none;border:none;padding:8px 12px;border-radius:10px;cursor:pointer}
+    .nav-links button.active{background:linear-gradient(90deg,var(--accent),#0ea5e9);color:#fff}
+
+    /* ===== Hero ===== */
+    .hero{display:grid;grid-template-columns:1fr 400px;gap:24px;align-items:center;padding:40px 0}
+    .hero-card{background:var(--card);padding:26px;border-radius:18px;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
+    h1{font-size:28px;margin:0 0 8px}
+    p.lead{color:var(--muted);margin:0 0 14px}
+    .cta{display:flex;gap:10px}
+    .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;border:none;cursor:pointer}
+    .btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(30,136,229,0.14)}
+
+    /* ===== Rooms grid ===== */
+    .rooms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .room{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 4px 14px rgba(2,6,23,0.04);display:flex;flex-direction:column;gap:8px}
+    .room img{width:100%;height:160px;object-fit:cover;border-radius:8px}
+    .room .meta{display:flex;justify-content:space-between;align-items:center}
+    .badge{padding:6px 8px;border-radius:10px;font-weight:600;font-size:12px}
+    .badge.available{background:#e6f7ee;color:#047857}
+    .badge.process{background:#fff7ed;color:#b45309}
+    .badge.occupied{background:#ffebee;color:#b91c1c}
+
+    /* countdown small */
+    .countdown{font-weight:700;font-family:monospace}
+
+    /* ===== Booking & contact ===== */
+    .two-col{display:grid;grid-template-columns:1fr 360px;gap:16px}
+    form.card{padding:16px;border-radius:12px;background:var(--card);box-shadow:0 6px 18px rgba(2,6,23,0.04)}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(15,23,42,0.06);margin-bottom:12px}
+
+    /* ===== Admin Panel ===== */
+    .admin-panel{padding:16px;background:linear-gradient(180deg,rgba(30,136,229,0.06),rgba(14,165,233,0.02));border-radius:12px}
+    .admin-grid{display:grid;grid-template-columns:1fr 280px;gap:12px}
+    .small{font-size:13px;color:var(--muted)}
+    .room-controls{display:flex;gap:8px;flex-wrap:wrap}
+
+    /* ===== Modals / pickup pages ===== */
+    .modal{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60}
+    .modal .panel{width:100%;max-width:680px;background:var(--card);padding:18px;border-radius:12px}
+
+    /* ===== Footer ===== */
+    footer{padding:18px 0;color:var(--muted);text-align:center}
+
+    /* ===== Responsive ===== */
+    @media (max-width:1024px){.hero{grid-template-columns:1fr 320px}.rooms-grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:720px){.hero{grid-template-columns:1fr}.two-col{grid-template-columns:1fr}.rooms-grid{grid-template-columns:1fr}.nav-links{display:none}.container{padding:12px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <div class="nav-left">
+          <div class="logo" onclick="showSection('home')" style="cursor:pointer"><div class="dot"></div>GuestHouse</div>
+          <div class="nav-links" id="navLinks">
+            <button onclick="showSection('home')" class="nav-btn active">Home</button>
+            <button onclick="showSection('rooms')" class="nav-btn">Rooms</button>
+            <button onclick="showSection('booking')" class="nav-btn">Booking</button>
+            <button onclick="showSection('contact')" class="nav-btn">Contact</button>
+            <button onclick="showSection('admin')" class="nav-btn">Admin</button>
+          </div>
+        </div>
+        <div>
+          <button class="btn" onclick="showSection('booking')">Book Now</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <!-- HERO / HOME -->
+      <section id="home" class="section">
+        <div class="hero">
+          <div class="hero-card">
+            <h1>Murakaza neza kuri GuestHouse</h1>
+            <p class="lead">Iyi ni demo ya frontend gusa. Ushobora gufata iyi code ugakora deploy kuri static hosting. Admin panel ikoreshwa kuri browser (localStorage).</p>
+            <div class="cta">
+              <button class="btn" onclick="showSection('rooms')">Reba Rooms</button>
+              <button class="btn secondary" onclick="showSection('contact')">Twandikire</button>
+            </div>
+
+            <hr style="margin:18px 0;border:none;border-top:1px dashed rgba(15,23,42,0.06)">
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+              <div>
+                <strong>Live rooms:</strong>
+                <div id="liveStats" class="small">Loading…</div>
+              </div>
+              <div>
+                <strong>Admin quick:</strong>
+                <div class="small">Login with password <code>admin123</code> (local only)</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="hero-card">
+              <h3>Gallery</h3>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <img src="https://picsum.photos/seed/gh1/400/240" alt="g1" style="width:100%;height:110px;object-fit:cover;border-radius:8px">
+                <img src="https://picsum.photos/seed/gh2/400/240" alt="g2" style="width:100%;height:110px;object-fit:cover;border-radius:8px">
+                <img src="https://picsum.photos/seed/gh3/400/240" alt="g3" style="width:100%;height:110px;object-fit:cover;border-radius:8px">
+                <img src="https://picsum.photos/seed/gh4/400/240" alt="g4" style="width:100%;height:110px;object-fit:cover;border-radius:8px">
+              </div>
+            </div>
+
+            <div style="height:12px"></div>
+
+            <div class="hero-card">
+              <h4>Quick actions</h4>
+              <div style="display:flex;gap:8px;margin-top:10px">
+                <button class="btn" onclick="showSection('admin')">Open Admin</button>
+                <button class="btn secondary" onclick="exportData()">Export Data</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ROOMS -->
+      <section id="rooms" class="section" style="display:none;margin-top:18px">
+        <h2>Icyumba (Rooms)</h2>
+        <p class="small">Kanda kuri "Details" kugirango ufungure pickup page.</p>
+        <div id="roomsGrid" class="rooms-grid" style="margin-top:12px"></div>
+      </section>
+
+      <!-- BOOKING -->
+      <section id="booking" class="section" style="display:none;margin-top:18px">
+        <h2>Gutura / Booking</h2>
+        <div class="two-col" style="margin-top:12px">
+          <div>
+            <form id="bookingForm" class="card">
+              <h3>Fata icyumba</h3>
+              <label>Izina (Full name)</label>
+              <input required id="guestName" placeholder="Jules Ndatimana">
+              <label>Email</label>
+              <input id="guestEmail" type="email" placeholder="you@example.com">
+              <label>Room</label>
+              <select id="guestRoom"></select>
+              <label>Timer (minutes) — igihe cya process</label>
+              <input id="bookingTimer" type="number" min="1" value="15">
+              <label>Note</label>
+              <textarea id="guestNote" rows="3" placeholder="requests... "></textarea>
+              <div style="display:flex;gap:8px">
+                <button class="btn" type="submit">Submit Booking</button>
+                <button type="button" class="btn secondary" onclick="clearBookings()">Clear Bookings</button>
+              </div>
+            </form>
+
+            <div style="height:12px"></div>
+
+            <div class="card">
+              <h4>Recent bookings</h4>
+              <div id="bookingsList" class="small">No bookings yet</div>
+            </div>
+          </div>
+
+          <aside>
+            <div class="admin-panel">
+              <h4>Quick Room Controls</h4>
+              <div id="adminRoomList" class="small">Loading rooms…</div>
+              <hr style="margin:12px 0;border:none;border-top:1px dashed rgba(15,23,42,0.06)">
+              <div class="small">Pickup pages will open when clicking "Details" on any room.</div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact" class="section" style="display:none;margin-top:18px">
+        <h2>Contact</h2>
+        <div class="two-col" style="margin-top:12px">
+          <div>
+            <form id="contactForm" class="card">
+              <h3>Twandikire</h3>
+              <label>Izina</label>
+              <input id="cName" required>
+              <label>Email</label>
+              <input id="cEmail" type="email">
+              <label>Ubutumwa</label>
+              <textarea id="cMessage" rows="5"></textarea>
+              <button class="btn" type="submit">Ohereza</button>
+            </form>
+          </div>
+          <aside>
+            <div class="card">
+              <h4>Info</h4>
+              <p class="small">Address: Kigali, Rwanda</p>
+              <p class="small">Tel: +250 788 000 000</p>
+              <p class="small">Email: info@guesthouse.rw</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ADMIN -->
+      <section id="admin" class="section" style="display:none;margin-top:18px">
+        <h2>Admin Panel</h2>
+        <div style="margin-top:12px">
+          <div class="admin-grid">
+            <div>
+              <div class="card">
+                <h3>Login</h3>
+                <div class="small">(Local only demo) Password: <code>admin123</code></div>
+                <input id="adminPass" placeholder="Enter admin password">
+                <div style="margin-top:10px;display:flex;gap:8px">
+                  <button class="btn" onclick="loginAdmin()">Login</button>
+                  <button class="btn secondary" onclick="logoutAdmin()">Logout</button>
+                </div>
+                <div id="adminStatus" class="small" style="margin-top:8px">Not logged in</div>
+              </div>
+
+              <div style="height:12px"></div>
+
+              <div class="card">
+                <h3>Add / Edit Room</h3>
+                <label>Room name</label>
+                <input id="rName" placeholder="Twin Deluxe">
+                <label>Price</label>
+                <input id="rPrice" type="number" placeholder="25000">
+                <label>Image URL</label>
+                <input id="rImg" placeholder="https://...">
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button class="btn" onclick="addRoom()">Add Room</button>
+                  <button class="btn secondary" onclick="resetRoomsDemo()">Reset Demo Rooms</button>
+                </div>
+              </div>
+
+            </div>
+
+            <aside>
+              <div class="card">
+                <h3>System Data</h3>
+                <div class="small">Rooms: <span id="sysRoomsCount">0</span></div>
+                <div class="small">Bookings: <span id="sysBookingsCount">0</span></div>
+                <div style="height:8px"></div>
+                <h4>Admin Controls</h4>
+                <label>Default process minutes</label>
+                <input id="defaultProcessMinutes" type="number" value="15">
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button class="btn" onclick="applyDefaults()">Apply</button>
+                  <button class="btn secondary" onclick="clearAllData()">Clear All Data</button>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="card">
+            <h3>Bookings Table (Admin view)</h3>
+            <div id="adminBookingsTable" class="small">No bookings</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      © GuestHouse demo — Frontend only. Made for demonstration.
+    </div>
+  </footer>
+
+  <!-- Modal / pickup page -->
+  <div id="modal" style="display:none" class="modal">
+    <div class="panel" id="modalPanel"></div>
+  </div>
+
+  <script>
+    /* ===== Data model (stored in localStorage) ===== */
+    const STORAGE_KEY = 'guesthouse_demo_v1';
+
+    // Default demo rooms
+    const DEFAULT_ROOMS = [
+      {id:1,name:'Twin Deluxe',price:25000,img:'https://picsum.photos/seed/room1/800/600',status:'available',timerEnds:null},
+      {id:2,name:'Single Cozy',price:15000,img:'https://picsum.photos/seed/room2/800/600',status:'available',timerEnds:null},
+      {id:3,name:'Family Suite',price:40000,img:'https://picsum.photos/seed/room3/800/600',status:'available',timerEnds:null},
+      {id:4,name:'Budget Room',price:9000,img:'https://picsum.photos/seed/room4/800/600',status:'available',timerEnds:null}
+    ];
+
+    // load or init
+    function loadData(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return {rooms:DEFAULT_ROOMS.slice(),bookings:[]};
+      try{ return JSON.parse(raw);}catch(e){return {rooms:DEFAULT_ROOMS.slice(),bookings:[]}};
+    }
+    function saveData(data){ localStorage.setItem(STORAGE_KEY,JSON.stringify(data)); }
+
+    let state = loadData();
+    let adminLogged = false;
+
+    /* ===== UI helpers ===== */
+    function showSection(id){
+      document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+      document.getElementById(id).style.display='block';
+      document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b=>{if(b.textContent.trim().toLowerCase()===id) b.classList.add('active')})
+      if(id==='rooms') renderRooms();
+      if(id==='booking') populateBookingRooms();
+      if(id==='admin') renderAdmin();
+    }
+
+    /* ===== Render rooms grid ===== */
+    function renderRooms(){
+      const grid = document.getElementById('roomsGrid'); grid.innerHTML='';
+      state.rooms.forEach(r=>{
+        const div = document.createElement('div'); div.className='room';
+        div.innerHTML = `
+          <img src="${r.img}" alt="${r.name}">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>${r.name}</strong><div class="small">RWF ${r.price}</div></div>
+            <div>
+              <div class="badge ${r.status==='available'?'available':r.status==='process'?'process':'occupied'}">${r.status.toUpperCase()}</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="small">ID: ${r.id}</div>
+            <div>
+              <button class="btn secondary" onclick="openRoomModal(${r.id})">Details</button>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="small">Timer: <span id="cd-${r.id}" class="countdown">${r.status==='process'?formatRemaining(r.timerEnds):'--:--'}</span></div>
+            <div class="small">&nbsp;</div>
+          </div>
+        `;
+        grid.appendChild(div);
+      });
+      updateLiveStats();
+    }
+
+    /* ===== Modal / pickup page ===== */
+    function openRoomModal(id){
+      const room = state.rooms.find(r=>r.id===id); if(!room) return;
+      const panel = document.getElementById('modalPanel');
+      panel.innerHTML = `
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <img src="${room.img}" style="width:210px;height:140px;object-fit:cover;border-radius:8px">
+          <div style="flex:1">
+            <h3>${room.name}</h3>
+            <div class="small">Price: RWF ${room.price}</div>
+            <p class="small">Status: <strong>${room.status}</strong></p>
+            <div style="margin-top:12px;display:flex;gap:8px">
+              <button class="btn" onclick="startBookingFromModal(${room.id})">Book this room</button>
+              <button class="btn secondary" onclick="closeModal()">Close</button>
+            </div>
+            <div style="margin-top:8px" class="small">Timer: <span id="modal-cd-${room.id}">${room.status==='process'?formatRemaining(room.timerEnds):'--:--'}</span></div>
+          </div>
+        </div>
+      `;
+      document.getElementById('modal').style.display='flex';
+    }
+    function closeModal(){ document.getElementById('modal').style.display='none'; }
+    function startBookingFromModal(id){ closeModal(); showSection('booking'); document.getElementById('guestRoom').value = id; }
+
+    /* ===== Booking form ===== */
+    document.getElementById('bookingForm').addEventListener('submit',function(e){ e.preventDefault();
+      const name = document.getElementById('guestName').value.trim();
+      const email = document.getElementById('guestEmail').value.trim();
+      const roomId = Number(document.getElementById('guestRoom').value);
+      const minutes = Number(document.getElementById('bookingTimer').value) || 15;
+      const note = document.getElementById('guestNote').value.trim();
+      const room = state.rooms.find(r=>r.id===roomId);
+      if(!room){alert('Please select a valid room');return;}
+      if(room.status==='occupied'){alert('Room already occupied');return;}
+
+      // create booking
+      const booking = {id:Date.now(),name,email,roomId,minutes,note,created:Date.now(),status:'active'};
+      state.bookings.push(booking);
+      // set room to process
+      const ends = Date.now()+minutes*60*1000;
+      room.status='process'; room.timerEnds=ends;
+      saveData(state); renderRooms(); populateBookingRooms(); renderBookings(); renderAdminBookings();
+      alert('Booking created. Room is now in PROCESS for '+minutes+' minutes.');
+      document.getElementById('bookingForm').reset(); document.getElementById('bookingTimer').value = minutes;
+    });
+
+    function populateBookingRooms(){
+      const sel = document.getElementById('guestRoom'); sel.innerHTML='';
+      state.rooms.forEach(r=>{
+        const opt = document.createElement('option'); opt.value=r.id; opt.textContent=`${r.name} — ${r.status.toUpperCase()}`; sel.appendChild(opt);
+      });
+      renderAdminQuickList();
+    }
+
+    function renderBookings(){
+      const el = document.getElementById('bookingsList');
+      if(state.bookings.length===0){ el.textContent='No bookings yet'; return; }
+      el.innerHTML = '';
+      state.bookings.slice().reverse().forEach(b=>{
+        const div = document.createElement('div'); div.style.padding='8px 0';
+        const room = state.rooms.find(r=>r.id===b.roomId);
+        div.innerHTML = `<strong>${b.name}</strong> — ${room?room.name:'?'} <div class="small">${new Date(b.created).toLocaleString()}</div>`;
+        el.appendChild(div);
+      });
+    }
+
+    /* ===== Admin functions ===== */
+    function loginAdmin(){
+      const pass = document.getElementById('adminPass').value;
+      if(pass==='admin123'){ adminLogged=true; document.getElementById('adminStatus').textContent='Logged in as admin'; renderAdmin(); alert('Admin logged in'); }
+      else{ alert('Wrong password'); }
+    }
+    function logoutAdmin(){ adminLogged=false; document.getElementById('adminStatus').textContent='Not logged in'; renderAdmin(); }
+
+    function renderAdmin(){
+      document.getElementById('sysRoomsCount').textContent = state.rooms.length;
+      document.getElementById('sysBookingsCount').textContent = state.bookings.length;
+      renderRooms(); populateBookingRooms(); renderBookings(); renderAdminBookings();
+      document.getElementById('adminRoomList').innerHTML = state.rooms.map(r=>{
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(15,23,42,0.03)"><div><strong>${r.name}</strong><div class="small">${r.status}</div></div><div class="room-controls">${adminLogged?`<button class=\"btn\" onclick=\"adminSetStatus(${r.id},'available')\">Available</button><button class=\"btn secondary\" onclick=\"adminSetStatus(${r.id},'process')\">Process</button><button class=\"btn secondary\" onclick=\"adminSetStatus(${r.id},'occupied')\">Occupied</button>`:'<span class="small">Login to manage</span>'}</div></div>`;
+      }).join('');
+    }
+
+    function adminSetStatus(id,status){ if(!adminLogged){alert('Please login as admin');return;} const room = state.rooms.find(r=>r.id===id); if(!room) return; room.status=status; if(status!=='process') room.timerEnds=null; else room.timerEnds = Date.now() + Number(document.getElementById('defaultProcessMinutes').value||15)*60*1000; saveData(state); renderRooms(); renderAdmin(); }
+
+    function addRoom(){ if(!adminLogged){alert('Login as admin to add rooms');return;} const name = document.getElementById('rName').value.trim(); const price = Number(document.getElementById('rPrice').value)||0; const img = document.getElementById('rImg').value.trim()||('https://picsum.photos/seed/room'+(Math.random()*1000|0)+'/800/600');
+      if(!name){alert('Enter room name');return;} const id = (state.rooms.reduce((m,r)=>Math.max(m,r.id),0) || 0) +1; state.rooms.push({id,name,price,img,status:'available',timerEnds:null}); saveData(state); renderAdmin(); populateBookingRooms(); alert('Room added');
+    }
+
+    function resetRoomsDemo(){ if(!confirm('Reset demo rooms? This will overwrite existing rooms.')) return; state.rooms = DEFAULT_ROOMS.slice(); saveData(state); renderAdmin(); populateBookingRooms(); renderRooms(); }
+
+    function applyDefaults(){ if(!adminLogged){alert('Login as admin');return;} const v = Number(document.getElementById('defaultProcessMinutes').value)||15; alert('Applied default process minutes: '+v); }
+
+    function clearAllData(){ if(!confirm('Clear ALL local data?')) return; localStorage.removeItem(STORAGE_KEY); state = loadData(); saveData(state); renderAdmin(); populateBookingRooms(); renderRooms(); renderBookings(); renderAdminBookings(); alert('Cleared'); }
+
+    function clearBookings(){ if(!confirm('Clear bookings?')) return; state.bookings = []; // mark rooms available
+      state.rooms.forEach(r=>{ if(r.status==='process') r.status='available'; r.timerEnds=null; }); saveData(state); renderRooms(); renderBookings(); renderAdminBookings(); }
+
+    /* ===== Bookings admin table ===== */
+    function renderAdminBookings(){ const el = document.getElementById('adminBookingsTable'); if(state.bookings.length===0){ el.textContent='No bookings'; return;} el.innerHTML = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>Name</th><th>Room</th><th>Minutes</th><th>Created</th><th>Action</th></tr></thead><tbody>'+state.bookings.map(b=>{
+      const room = state.rooms.find(r=>r.id===b.roomId); return `<tr><td>${b.name}</td><td>${room?room.name:'?'}</td><td>${b.minutes}</td><td>${new Date(b.created).toLocaleString()}</td><td>${adminLogged?`<button class=\"btn\" onclick=\"adminCancelBooking(${b.id})\">Cancel</button>`:'-'}</td></tr>`
+    }).join('')+'</tbody></table>'; }
+
+    function adminCancelBooking(id){ if(!adminLogged){alert('Login');return;} const idx = state.bookings.findIndex(b=>b.id===id); if(idx===-1) return; const roomId = state.bookings[idx].roomId; state.bookings.splice(idx,1); const room = state.rooms.find(r=>r.id===roomId); if(room){room.status='available';room.timerEnds=null;} saveData(state); renderAdminBookings(); renderRooms(); renderBookings(); }
+
+    /* ===== Countdown / timer system ===== */
+    function formatRemaining(ends){ if(!ends) return '--:--'; const rem = Math.max(0, Math.floor((ends - Date.now())/1000)); const m = Math.floor(rem/60); const s = rem%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
+
+    function tickCountdowns(){
+      let changed=false;
+      state.rooms.forEach(r=>{
+        if(r.status==='process' && r.timerEnds){
+          const el = document.getElementById('cd-'+r.id);
+          if(el) el.textContent = formatRemaining(r.timerEnds);
+          const modalEl = document.getElementById('modal-cd-'+r.id); if(modalEl) modalEl.textContent = formatRemaining(r.timerEnds);
+          if(Date.now() >= r.timerEnds){
+            // time finished => mark occupied
+            r.status='occupied'; r.timerEnds=null; changed=true;
+            // mark related bookings complete (simple logic)
+            state.bookings.forEach(b=>{ if(b.roomId===r.id && b.status==='active') b.status='completed'; });
+          }
+        }
+      });
+      if(changed) saveData(state);
+      updateLiveStats();
+    }
+    setInterval(tickCountdowns,1000);
+
+    /* ===== Utilities ===== */
+    function updateLiveStats(){ const avail = state.rooms.filter(r=>r.status==='available').length; const proc = state.rooms.filter(r=>r.status==='process').length; const occ = state.rooms.filter(r=>r.status==='occupied').length; document.getElementById('liveStats').textContent = `Available: ${avail} · Process: ${proc} · Occupied: ${occ}`; }
+
+    function adminSetStatusManual(id,status){ adminSetStatus(id,status); }
+
+    function adminCancelBookingByRoom(roomId){ state.bookings = state.bookings.filter(b=>b.roomId!==roomId); const r = state.rooms.find(x=>x.id===roomId); if(r){r.status='available';r.timerEnds=null;} saveData(state); renderRooms(); renderBookings(); renderAdminBookings(); }
+
+    function adminCancelAllProcess(){ if(!adminLogged){alert('Login as admin');return;} state.rooms.forEach(r=>{ if(r.status==='process') { r.status='available'; r.timerEnds=null; } }); state.bookings.forEach(b=>{ if(b.status==='active') b.status='cancelled' }); saveData(state); renderRooms(); renderBookings(); renderAdminBookings(); }
+
+    function exportData(){ const dataStr = JSON.stringify(state, null, 2); const blob = new Blob([dataStr],{type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'guesthouse-data.json'; a.click(); URL.revokeObjectURL(url); }
+
+    /* ===== Contact form ===== */
+    document.getElementById('contactForm').addEventListener('submit', function(e){ e.preventDefault(); alert('Message sent (demo). Thank you!'); this.reset(); });
+
+    /* ===== Admin cancel booking helper ===== */
+    function adminCancelBookingById(id){ adminCancelBooking(id); }
+
+    /* ===== Initialization ===== */
+    function renderAdminQuickList(){ const el = document.getElementById('adminRoomList'); if(!el) return; el.innerHTML = state.rooms.map(r=>`<div style=\"padding:6px 0;border-bottom:1px dashed rgba(15,23,42,0.03)\"><strong>${r.name}</strong> <div class=\"small\">${r.status}</div></div>`).join(''); }
+
+    function renderAll(){ renderRooms(); populateBookingRooms(); renderBookings(); renderAdmin(); }
+
+    // Init save to ensure storage exists
+    saveData(state);
+    renderAll();
+
+    // Expose some functions to window for inline handlers
+    window.showSection = showSection;
+    window.openRoomModal = openRoomModal;
+    window.closeModal = closeModal;
+    window.startBookingFromModal = startBookingFromModal;
+    window.loginAdmin = loginAdmin;
+    window.logoutAdmin = logoutAdmin;
+    window.addRoom = addRoom;
+    window.resetRoomsDemo = resetRoomsDemo;
+    window.adminSetStatus = adminSetStatus;
+    window.exportData = exportData;
+    window.clearBookings = clearBookings;
+    window.clearAllData = clearAllData;
+    window.adminCancelBooking = adminCancelBooking;
+
+    // Show home by default
+    showSection('home');
+
+  </script>
+</body>
+</html>

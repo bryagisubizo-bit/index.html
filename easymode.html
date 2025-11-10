@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🐧 Penguin Rescue – Easy Mode 🐧</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #5cb8ff, #a0e7e5);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .game-container {
+      width: 90%;
+      max-width: 800px;
+      height: 90vh;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .header {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      color: white;
+      font-size: 2.2rem;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      color: white;
+      font-size: 1.2rem;
+      margin-top: 10px;
+    }
+
+    .game-area {
+      height: calc(100% - 160px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .question {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 15px 35px;
+      border-radius: 15px;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #005f73;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .input-area {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 15px;
+    }
+
+    .input-area input {
+      padding: 15px 20px;
+      font-size: 1.3rem;
+      border: none;
+      border-radius: 15px;
+      width: 130px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .input-area button {
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      background: #0a343c;
+      color: white;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .input-area button:hover {
+      background: #023547;
+      transform: translateY(-2px);
+    }
+
+    .message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 30px 50px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .message.show {
+      opacity: 1;
+    }
+
+    .penguin-image {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 120px;
+      height: 120px;
+    }
+
+    .penguin-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .dancing-penguin {
+      margin-top: 15px;
+      text-align: center;
+      animation: bounce 1s infinite;
+    }
+
+    .dancing-penguin img {
+      width: 120px;
+      border-radius: 15px;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    /* 🏠 Home Button Styling */
+.home-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  font-size: 1.8rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 9999;
+}
+.home-button:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+}
+  </style>
+</head>
+<body>
+  <!-- 🏠 Home Button -->
+<button id="home-btn" class="home-button" title="Go Home">🏠</button>
+  <canvas id="rainCanvas"></canvas>
+
+  <div class="game-container">
+    <div class="header">
+      <h1>🐧 Penguin Rescue – Easy Mode 🐧</h1>
+      <div class="stats">
+        <div>Questions: <span id="question-count">0</span>/5</div>
+        <div>Correct: <span id="correct-count">0</span></div>
+        <div>Penguins Free: <span id="penguin-count">0</span></div>
+      </div>
+    </div>
+
+    <div class="game-area" id="game-area">
+      <div class="penguin-image">
+        <img src="https://pfst.cf2.poecdn.net/base/image/74f24b026c77420015a92aa45e28629d5c10d0d5657043469463be18d231f0f0?w=512&h=512" alt="Cute Penguin" />
+      </div>
+    </div>
+
+    <div class="input-area">
+      <input type="number" id="answer-input" placeholder="?" />
+      <button id="submit-btn">Submit</button>
+    </div>
+
+    <div class="message" id="message">
+      <h2 id="message-title">Game Over!</h2>
+      <p id="message-text">You freed <span id="freed-penguins">0</span> penguins!</p>
+      <button onclick="restartGame()">Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    // 🎄 Snowfall Background
+    const canvas = document.getElementById("rainCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const snowflakes = [];
+    for (let i = 0; i < 120; i++) {
+      snowflakes.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 3 + 1,
+        s: Math.random() + 0.3,
+      });
+    }
+    function drawSnow() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      for (const f of snowflakes) {
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        ctx.fill();
+        f.y += f.s;
+        if (f.y > canvas.height) {
+          f.y = -5;
+          f.x = Math.random() * canvas.width;
+        }
+      }
+      requestAnimationFrame(drawSnow);
+    }
+    drawSnow();
+
+    // 🧩 Game Logic
+    const gameArea = document.getElementById("game-area");
+    const answerInput = document.getElementById("answer-input");
+    const questionCountEl = document.getElementById("question-count");
+    const correctCountEl = document.getElementById("correct-count");
+    const penguinCountEl = document.getElementById("penguin-count");
+    const messageBox = document.getElementById("message");
+    const freedPenguins = document.getElementById("freed-penguins");
+    const submitBtn = document.getElementById("submit-btn");
+
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let correctCount = 0;
+    let freedCount = 0;
+    let gameActive = true;
+    let currentQuestion = null;
+    let fallTimer = null;
+
+    function generateQuestions() {
+      const arr = [];
+      for (let i = 0; i < 5; i++) {
+        const op = Math.random() > 0.5 ? "+" : "-";
+        let a = Math.floor(Math.random() * 10) + 1;
+        let b = Math.floor(Math.random() * 10) + 1;
+        if (op === "-" && b > a) [a, b] = [b, a];
+        arr.push({ text: `${a} ${op} ${b} = ?`, ans: op === "+" ? a + b : a - b });
+      }
+      return arr;
+    }
+
+    function startGame() {
+      questions = generateQuestions();
+      currentQuestionIndex = 0;
+      correctCount = 0;
+      freedCount = 0;
+      messageBox.classList.remove("show");
+      showQuestion();
+    }
+
+    function showQuestion() {
+      if (currentQuestionIndex >= questions.length) return endGame();
+
+      const q = questions[currentQuestionIndex];
+      questionCountEl.textContent = currentQuestionIndex + 1;
+
+      if (currentQuestion) currentQuestion.remove();
+      currentQuestion = document.createElement("div");
+      currentQuestion.className = "question";
+      currentQuestion.textContent = q.text;
+      gameArea.appendChild(currentQuestion);
+
+      let pos = -80;
+      fallTimer = setInterval(() => {
+        if (!gameActive) return;
+        pos += 3;
+        currentQuestion.style.top = pos + "px";
+        if (pos > gameArea.clientHeight - 100) {
+          clearInterval(fallTimer);
+          currentQuestion.remove();
+          currentQuestionIndex++;
+          showQuestion();
+        }
+      }, 40);
+    }
+
+    function checkAnswer() {
+      if (!gameActive || !currentQuestion) return;
+      const val = parseInt(answerInput.value);
+      const correct = questions[currentQuestionIndex].ans;
+      if (val === correct) {
+        correctCount++;
+        freedCount++;
+        correctCountEl.textContent = correctCount;
+        penguinCountEl.textContent = freedCount;
+        clearInterval(fallTimer);
+        currentQuestion.remove();
+        currentQuestionIndex++;
+        answerInput.value = "";
+        showQuestion();
+      } else {
+        answerInput.value = "";
+      }
+    }
+
+    submitBtn.onclick = checkAnswer;
+    answerInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") checkAnswer();
+    });
+
+    function endGame() {
+      gameActive = false;
+      messageBox.classList.add("show");
+      freedPenguins.textContent = freedCount;
+      showDancingPenguin();
+    }
+
+    function restartGame() {
+      if (document.querySelector(".dancing-penguin"))
+        document.querySelector(".dancing-penguin").remove();
+      gameActive = true;
+      startGame();
+    }
+
+    function showDancingPenguin() {
+      const dance = document.createElement("div");
+      dance.className = "dancing-penguin";
+      dance.innerHTML = `
+        <h3>🎉 Congratulations! 🎉</h3>
+        <img src="https://media.giphy.com/media/3oKIPwoeGErMmaI43C/giphy.gif" alt="Dancing Penguin">
+      `;
+      messageBox.appendChild(dance);
+    }
+
+    startGame();
+    // 🏠 Go Home instantly
+document.getElementById("home-btn").addEventListener("click", () => {
+  window.location.href = "file:///F:/loading%20game.html";
+});
+  </script>
+</body>
+</html>
